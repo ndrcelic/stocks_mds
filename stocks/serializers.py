@@ -4,6 +4,7 @@ from .models import Stock, DatesValues
 
 class DatesValuesSerializer(serializers.ModelSerializer):
     # stock = StockSerializer()
+    date = serializers.DateField(input_formats=['%m/%d/%Y'])
 
     class Meta:
         model = DatesValues
@@ -11,8 +12,9 @@ class DatesValuesSerializer(serializers.ModelSerializer):
 
 
 class StockSerializer(serializers.ModelSerializer):
-    date_values = DatesValuesSerializer(many=True, read_only=True)
-    
+    # date_values = DatesValuesSerializer(many=True, read_only=True)
+    date_of_creation = serializers.DateTimeField(input_formats=['%m/%d/%Y'])
+
     class Meta:
         model = Stock
-        fields = ['id', 'name', 'date_of_creation', 'abbreviation', 'date_values']
+        fields = ['id', 'name', 'date_of_creation', 'abbreviation']

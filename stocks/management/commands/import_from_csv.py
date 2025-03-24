@@ -16,7 +16,8 @@ class Command(BaseCommand):
             return
 
         path = Path(options['path'])
-
+        print(path)
+        print(options['path'])
         if os.path.isdir(options['path']):
             csv_files = [file for file in path.glob('*.csv')]
 
@@ -56,3 +57,17 @@ class Command(BaseCommand):
                                                   close=row['Close'], high=row['High'], low=row['Low'],
                                                   adj_close=row['Adj Close'], volume=row['Volume'])
             print(f'Values were added for {file_name}')
+
+            stocks = Stock.objects.all()
+            for stock in stocks:
+                if stock.name == "Amazon":
+                    stock.abbreviation = "AMZN"
+                if stock.name == "Apple":
+                    stock.abbreviation = "APPL"
+                if stock.name == "Facebook":
+                    stock.abbreviation = "FB"
+                if stock.name == "Google":
+                    stock.abbreviation = "GOOGL"
+                if stock.name == "Netflix":
+                    stock.abbreviation = "NFLX"
+                stock.save()

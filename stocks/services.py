@@ -1,72 +1,54 @@
 from .models import Stock, DatesValues
 from datetime import timedelta
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 def calculation(start_date=None, end_date=None, company=None):
     number_of_days = 1 + end_date.day - start_date.day
 
     pre_range_start_date = start_date - timedelta(days=number_of_days)
     pre_range_end_date = pre_range_start_date + timedelta(days=number_of_days - 1)
+
     post_range_start_date = end_date + timedelta(days=1)
     post_range_end_date = end_date + timedelta(days=number_of_days)
 
-    pre_range = DatesValues.objects.filter(date__gte=pre_range_start_date, date__lte=pre_range_end_date)
-    ret_vals =one_trade_calculate(list(pre_range.filter(stock__abbreviation=company)))
-    pre_range_buy = ret_vals[0] if len(ret_vals) else None
-    pre_range_sale = ret_vals[1] if len(ret_vals) else None
-    pre_range_profit = pre_range_sale.close - pre_range_buy.close if len(ret_vals) else "not"
+    pre_range_dict = read_from_db(pre_range_start_date, pre_range_end_date, company)
+    in_range_dict = read_from_db(start_date, end_date, company)
+    post_range_dict = read_from_db(post_range_start_date, post_range_end_date, company)
 
-    pre_range_more_trade_profit = more_trade_calculate(list(pre_range.filter(stock__abbreviation=company)))
-    pre_range_better_stocks = compare(pre_range, company)
-
-    in_range = DatesValues.objects.filter(date__range=[start_date, end_date])
-    ret_vals = one_trade_calculate(list(in_range.filter(stock__abbreviation=company)))
-    in_range_buy = ret_vals[0] if len(ret_vals) else None
-    in_range_sale = ret_vals[1] if len(ret_vals) else None
-    in_range_profit = in_range_sale.close - in_range_buy.close if len(ret_vals) else "not"
-
-    in_range_more_trade_profit = more_trade_calculate(list(in_range.filter(stock__abbreviation=company)))
-    in_range_better_stocks = compare(in_range, company)
-
-    post_range = DatesValues.objects.filter(date__gte=post_range_start_date, date__lte=post_range_end_date, )
-    ret_vals = one_trade_calculate(list(post_range.filter(stock__abbreviation=company)))
-    post_range_buy = ret_vals[0] if len(ret_vals) else None
-    post_range_sale = ret_vals[1] if len(ret_vals) else None
-    post_range_profit = post_range_sale.close - post_range_buy.close if len(ret_vals) else "not"
-
-    post_range_more_trade_profit = more_trade_calculate(list(post_range.filter(stock__abbreviation=company)))
-    post_range_better_stocks = compare(post_range, company)
-
-    processed_data = {"pre_range": {"in_date": pre_range_start_date.strftime("%m/%d/%Y"),
-                                       "end_date": pre_range_end_date.strftime("%m/%d/%Y"),
-                                       "best_buy_date": pre_range_buy.date.strftime("%m/%d/%Y"),
-                                       "best_buy_close": pre_range_buy.close,
-                                       "best_sale_date": pre_range_sale.date.strftime("%m/%d/%Y"),
-                                       "best_sale_close": pre_range_sale.close,
-                                       "profit": pre_range_profit,
-                                       "more_trade_profit": pre_range_more_trade_profit,
-                                       "better_stocks": pre_range_better_stocks},
-                         "in_range": {"in_date": start_date.strftime("%m/%d/%Y"),
-                                      "end_date": end_date.strftime("%m/%d/%Y"),
-                                      "best_buy_date": in_range_buy.date.strftime("%m/%d/%Y"),
-                                      "best_buy_close": in_range_buy.close,
-                                      "best_sale_date": in_range_sale.date.strftime("%m/%d/%Y"),
-                                      "best_sale_close": in_range_sale.close,
-                                      "profit": in_range_profit,
-                                      "more_trade_profit": in_range_more_trade_profit,
-                                      "better_stocks": in_range_better_stocks},
-                         "post_range": {"in_date": post_range_start_date.strftime("%m/%d/%Y"),
-                                        "end_date": post_range_end_date.strftime("%m/%d/%Y"),
-                                        "best_buy_date": post_range_buy.date.strftime("%m/%d/%Y"),
-                                        "best_buy_close": post_range_buy.close,
-                                        "best_sale_date": post_range_sale.date.strftime("%m/%d/%Y"),
-                                        "best_sale_close": post_range_sale.close,
-                                        "profit": post_range_profit,
-                                        "more_trade_profit": post_range_more_trade_profit,
-                                        "better_stocks": post_range_better_stocks},
-                         }
+    processed_data = {"pre_range": pre_range_dict,
+                    "in_range": in_range_dict,
+                    "post_range": post_range_dict}
 
     return processed_data
+
+
+def read_from_db(range_start_date, range_end_date, company) -> Dict:
+    range = DatesValues.objects.filter(date__gte=range_start_date, date__lte=range_end_date)
+    ret_vals = one_trade_calculate(list(range.filter(stock__abbreviation=company)))
+    range_buy = ret_vals[0] if len(ret_vals) else None
+    range_sale = ret_vals[1] if len(ret_vals) else None
+    range_profit = range_sale.close - range_buy.close if len(ret_vals) else 0
+
+    range_more_trade_profit = more_trade_calculate(list(range.filter(stock__abbreviation=company)))
+    range_better_stocks = compare(range, company)
+
+    range_dict = {"in_date": range_start_date.strftime("%m/%d/%Y"),
+                      "end_date": range_end_date.strftime("%m/%d/%Y")}
+    if len(ret_vals) == 0:
+        if range.count() == 0:
+            range_dict.update({"message": "The period is out of range."})
+        else:
+            range_dict.update({"message": "It was not a good period for trading."})
+    if len(ret_vals) > 0:
+        range_dict.update({"best_buy_date": range_buy.date.strftime("%m/%d/%Y") if range_buy else "",
+                               "best_buy_close": range_buy.close if range_buy else "",
+                               "best_sale_date": range_sale.date.strftime("%m/%d/%Y") if range_buy else "",
+                               "best_sale_close": range_sale.close if range_buy else ""})
+    range_dict.update({"profit": range_profit,
+                           "more_trade_profit": range_more_trade_profit,
+                           "better_stocks": range_better_stocks})
+
+    return range_dict
 
 
 def one_trade_calculate(input_values: List) -> Tuple:
@@ -124,8 +106,5 @@ def compare(query_set, company):
         stock_set = query_set.filter(stock=stock)
         if len(one_trade_calculate(list(stock_set))) > 0:
             ret_list.append(stock.name)
-
-    for ret in ret_list:
-        print(ret)
 
     return ret_list
