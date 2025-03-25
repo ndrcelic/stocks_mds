@@ -21,7 +21,7 @@ class CalculateAPITestCase(APITestCase):
         self.api = "/api/calculation/"
 
 
-    def test_calculate_success(self):
+    def test_calculate_one_trade_success(self):
         url = self.api + "?start_date=1/17/2023&end_date=1/21/2023&company=IBM"
         response = self.client.get(url)
 
@@ -29,6 +29,15 @@ class CalculateAPITestCase(APITestCase):
         self.assertEqual(response.json().get("pre_range").get("profit"), 2)
         self.assertEqual(response.json().get("in_range").get("profit"), 5)
         self.assertEqual(response.json().get("post_range").get("profit"), 0)
+
+    def test_calculate_more_trade_success(self):
+        url = self.api + "?start_date=1/14/2023&end_date=1/24/2023&company=IBM"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json().get("pre_range").get("more_trade_profit"), 0)
+        self.assertEqual(response.json().get("in_range").get("more_trade_profit"), 20)
+        self.assertEqual(response.json().get("post_range").get("more_trade_profit"), 0)
 
 
     def test_calculate_out_of_range_success(self):

@@ -80,20 +80,10 @@ def one_trade_calculate(input_values: List) -> Tuple:
 def more_trade_calculate(input_values: List):
     profit = 0
 
-    for obj_buy in input_values:
-        temp_profit = 0
-        for obj_sale in input_values:
-            if obj_buy.date >= obj_sale.date:
-                continue
-            # print(obj_buy.date, obj_sale.date)
-            difference = obj_sale.close - obj_buy.close
-            if difference > 0 and difference > temp_profit:
-                temp_profit = difference
+    for i in range(1, len(input_values)):
+        if input_values[i].close > input_values[i-1].close:
+            profit += input_values[i].close - input_values[i-1].close
 
-        profit += temp_profit
-        # print(profit)
-
-    # print(profit)
     return profit
 
 
