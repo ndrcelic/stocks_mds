@@ -20,10 +20,10 @@ class DatesValuesViewSet(viewsets.ModelViewSet):
 
 
 class CalculateVew(APIView):
-    def post(self, request):
-        start_date_str = request.data.get('start_date')
-        end_date_str = request.data.get('end_date')
-        company = request.data.get('company')
+    def get(self, request):
+        start_date_str = request.GET.get('start_date')
+        end_date_str = request.GET.get('end_date')
+        company = request.GET.get('company')
 
         if start_date_str is None or end_date_str is None or company is None:
             return Response({"error_message": "Some parameters are missing"}, status=status.HTTP_400_BAD_REQUEST)
