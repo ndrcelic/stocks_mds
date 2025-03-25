@@ -2,8 +2,25 @@ from rest_framework import serializers
 from .models import Stock, DatesValues
 
 
+class StockSerializer(serializers.ModelSerializer):
+    date_of_creation = serializers.DateTimeField(input_formats=['%m/%d/%Y'])
+
+    class Meta:
+        model = Stock
+        fields = ['id', 'name', 'date_of_creation', 'abbreviation']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance) or {}
+
+        if "date_of_creation" in representation:
+            representation["date_of_creation"] = instance.date_of_creation.strftime("%m/%d/%Y") \
+                if instance.date_of_creation else None
+
+        return representation
+
+
 class DatesValuesSerializer(serializers.ModelSerializer):
-    # stock = StockSerializer()
+    stock = StockSerializer()
     date = serializers.DateField(input_formats=['%m/%d/%Y'])
 
     class Meta:
@@ -15,22 +32,5 @@ class DatesValuesSerializer(serializers.ModelSerializer):
 
         if "date" in representation:
             representation["date"] = instance.date.strftime("%m/%d/%Y")
-
-        return representation
-
-
-class StockSerializer(serializers.ModelSerializer):
-    # date_values = DatesValuesSerializer(many=True, read_only=True)
-    date_of_creation = serializers.DateTimeField(input_formats=['%m/%d/%Y'])
-
-    class Meta:
-        model = Stock
-        fields = ['id', 'name', 'date_of_creation', 'abbreviation']
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance) or {}
-
-        if "date_of_creation" in representation:
-            representation["date_of_creation"] = instance.date_of_creation.strftime("%m/%d/%Y")
 
         return representation
