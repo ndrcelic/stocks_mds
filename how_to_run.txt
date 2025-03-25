@@ -1,0 +1,22 @@
+Koraci kako pokenuti aplikaiju:
+
+1. Kreiranje docker image-a ako ne postoji
+    docker build -t cont_name .
+
+2. Bildovanje i startovanje:
+    docker compose up -d
+
+3. Pokretanje migracija:
+    docker compose exec django-rest python manage.py migrate
+
+4. Komande za popunjavanje baze podacima iz CSV:
+    1. Kopiranje podataka u kontejnjer:
+        docker cp local/path cont_name:/app/
+    2. Izrvasavnje komande:
+        docker compose exec django-rest python manage.py import_from_csv /app/NAME
+
+5. Pokretanje testova:
+    docker compose exec python manage.py test
+
+6. Startovanje:
+    docker compose up --build
