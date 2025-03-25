@@ -102,7 +102,7 @@ def compare(query_set, company):
     ret_list = []
 
     for stock in stocks:
-        print(stock.name)
+        #print(stock.name)
         stock_set = query_set.filter(stock=stock)
         if len(one_trade_calculate(list(stock_set))) > 0:
             ret_list.append(stock.name)
