@@ -7,16 +7,16 @@ class CalculateAPITestCase(APITestCase):
     def setUp(self):
         self.stock = Stock.objects.create(name="IBM", abbreviation="IBM")
 
-        self.datevalue1 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 14), close=50)
-        self.datevalue2 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 15), close=52)
-        self.datevalue3 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 16), close=48)
-        self.datevalue4 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 17), close=50)
-        self.datevalue5 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 19), close=55)
-        self.datevalue6 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 20), close=53)
-        self.datevalue7 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 21), close=45)
-        self.datevalue8 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 22), close=56)
-        self.datevalue9 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 23), close=52)
-        self.datevalue10 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 24), close=51)
+        self.date_value1 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 14), close=50)
+        self.date_value2 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 15), close=52)
+        self.date_value3 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 16), close=48)
+        self.date_value4 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 17), close=50)
+        self.date_value5 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 19), close=55)
+        self.date_value6 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 20), close=53)
+        self.date_value7 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 21), close=45)
+        self.date_value8 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 22), close=56)
+        self.date_value9 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 23), close=52)
+        self.date_value10 = DatesValues.objects.create(stock=self.stock, date=datetime.date(2023, 1, 24), close=51)
 
         self.api = "/api/calculation/"
 
