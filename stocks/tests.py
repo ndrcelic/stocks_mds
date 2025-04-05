@@ -35,9 +35,9 @@ class CalculateAPITestCase(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json().get("pre_range").get("more_trade_profit"), 0)
+        self.assertEqual(response.json().get("pre_range").get("message"), "The period is out of range.")
         self.assertEqual(response.json().get("in_range").get("more_trade_profit"), 20)
-        self.assertEqual(response.json().get("post_range").get("more_trade_profit"), 0)
+        self.assertEqual(response.json().get("post_range").get("message"), "The period is out of range.")
 
 
     def test_calculate_out_of_range_success(self):
